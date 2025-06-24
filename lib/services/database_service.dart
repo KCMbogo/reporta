@@ -27,7 +27,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'reporta.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createTables,
       onUpgrade: _upgradeDatabase,
     );
@@ -141,6 +141,21 @@ class DatabaseService {
 
       try {
         await db.execute('ALTER TABLE products ADD COLUMN image_url TEXT');
+      } catch (e) {
+        // Column might already exist
+      }
+    }
+
+    if (oldVersion < 4) {
+      // Add missing email and name columns to complaints table
+      try {
+        await db.execute('ALTER TABLE complaints ADD COLUMN email TEXT');
+      } catch (e) {
+        // Column might already exist
+      }
+
+      try {
+        await db.execute('ALTER TABLE complaints ADD COLUMN name TEXT');
       } catch (e) {
         // Column might already exist
       }
