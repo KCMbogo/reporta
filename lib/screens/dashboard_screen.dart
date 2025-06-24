@@ -21,6 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _totalProducts = 0;
   int _lowStockCount = 0;
   bool _isLoading = true;
+  List<Map<String, dynamic>> _recentActivity = [];
 
   @override
   void initState() {
@@ -32,11 +33,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       final totalProducts = await _databaseService.getTotalProductsCount();
       final lowStockCount = await _databaseService.getLowStockCount();
+      final recentTransactions =
+          await _databaseService.getStockTransactionsWithProducts();
+
+      // Get recent activity (last 5 transactions)
+      final recentActivity = recentTransactions.take(5).toList();
 
       if (mounted) {
         setState(() {
           _totalProducts = totalProducts;
           _lowStockCount = lowStockCount;
+          _recentActivity = recentActivity;
           _isLoading = false;
         });
       }
@@ -94,7 +101,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.inventory_2,
+                color: AppTheme.primaryColor,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Reporta'),
+          ],
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _refreshData),
@@ -109,55 +134,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Section
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
+              // Welcome Section with App Branding
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primaryColor,
+                      AppTheme.primaryColor.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      // App branding row
+                      Row(
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: AppTheme.primaryColor,
-                            child: Text(
-                              authProvider.currentUser?.name
-                                      .substring(0, 1)
-                                      .toUpperCase() ??
-                                  'U',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Welcome back,',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(
-                                    color: AppTheme.textSecondaryColor,
-                                  ),
-                                ),
-                                Text(
-                                  authProvider.currentUser?.name ?? 'User',
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.bold),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
+                            ),
+                            child: const Icon(
+                              Icons.inventory_2,
+                              color: AppTheme.primaryColor,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'REPORTA',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Inventory Management',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  );
-                },
+                      const SizedBox(height: 20),
+                      // User welcome row
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          return Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.2,
+                                ),
+                                child: Text(
+                                  authProvider.currentUser?.name
+                                          .substring(0, 1)
+                                          .toUpperCase() ??
+                                      'U',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Welcome,',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      authProvider.currentUser?.name ?? 'User',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -282,7 +384,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 32),
 
-              // Recent Activity Section (Placeholder)
+              // Recent Activity Section
               Text(
                 'Recent Activity',
                 style: Theme.of(
@@ -292,33 +394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               const SizedBox(height: 16),
 
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.inbox_outlined,
-                        size: 48,
-                        color: AppTheme.textSecondaryColor,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No recent activity',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Start by adding some products to your inventory',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.textSecondaryColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _buildRecentActivitySection(),
             ],
           ),
         ),
@@ -394,5 +470,113 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildRecentActivitySection() {
+    if (_recentActivity.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const Icon(
+                Icons.inbox_outlined,
+                size: 48,
+                color: AppTheme.textSecondaryColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No recent activity',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Start by adding some products to your inventory',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: Column(
+        children:
+            _recentActivity
+                .map((activity) => _buildActivityItem(activity))
+                .toList(),
+      ),
+    );
+  }
+
+  Widget _buildActivityItem(Map<String, dynamic> activity) {
+    final transactionType = activity['transaction_type'] as String;
+    final productName = activity['product_name'] as String;
+    final quantity = activity['quantity'] as int;
+    final createdAt = DateTime.parse(activity['created_at'] as String);
+    final timeAgo = _getTimeAgo(createdAt);
+
+    IconData icon;
+    Color color;
+    String action;
+
+    switch (transactionType) {
+      case 'stockIn':
+        icon = Icons.add_box;
+        color = AppTheme.successColor;
+        action = 'Stock In';
+        break;
+      case 'stockOut':
+        icon = Icons.remove_circle;
+        color = AppTheme.warningColor;
+        action = 'Stock Out';
+        break;
+      case 'sale':
+        icon = Icons.shopping_cart;
+        color = AppTheme.primaryColor;
+        action = 'Sale';
+        break;
+      default:
+        icon = Icons.edit;
+        color = AppTheme.infoColor;
+        action = 'Adjustment';
+    }
+
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: color.withValues(alpha: 0.1),
+        child: Icon(icon, color: color, size: 20),
+      ),
+      title: Text(
+        '$action: $productName',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text('Quantity: $quantity'),
+      trailing: Text(
+        timeAgo,
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondaryColor),
+      ),
+    );
+  }
+
+  String _getTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
   }
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../providers/theme_provider.dart';
-import '../providers/locale_provider.dart';
+import '../services/notification_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/bottom_navigation.dart';
-import '../l10n/app_localizations.dart';
 import 'account_screen.dart';
 import 'feedback_screen.dart';
 import 'complaints_screen.dart';
@@ -25,36 +23,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _lowStockAlerts = true;
   bool _salesNotifications = false;
-  String _selectedLanguage = 'English';
-  String _selectedTheme = 'Light';
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      final localeProvider = Provider.of<LocaleProvider>(
-        context,
-        listen: false,
-      );
-      setState(() {
-        _selectedTheme = themeProvider.getThemeDisplayName(
-          themeProvider.themeMode,
-        );
-        _selectedLanguage = localeProvider.getLanguageDisplayName(
-          localeProvider.locale,
-        );
-      });
+    _loadNotificationPreferences();
+  }
+
+  Future<void> _loadNotificationPreferences() async {
+    final notificationsEnabled =
+        await _notificationService.getNotificationsEnabled();
+    final lowStockAlerts =
+        await _notificationService.getLowStockAlertsEnabled();
+    final salesNotifications =
+        await _notificationService.getSalesNotificationsEnabled();
+
+    setState(() {
+      _notificationsEnabled = notificationsEnabled;
+      _lowStockAlerts = lowStockAlerts;
+      _salesNotifications = salesNotifications;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.settings),
+        title: const Text('Settings'),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -97,34 +93,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
 
-            // App Preferences Section
-            _buildSectionHeader('App Preferences'),
-
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.palette),
-                    title: Text(localizations.theme),
-                    subtitle: Text(_selectedTheme),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => _showThemeDialog(),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.language),
-                    title: Text(localizations.language),
-                    subtitle: Text(_selectedLanguage),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => _showLanguageDialog(),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
             // Notifications Section
             _buildSectionHeader('Notifications'),
 
@@ -137,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: const Text('Enable Notifications'),
                     subtitle: const Text('Receive app notifications'),
                     value: _notificationsEnabled,
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         _notificationsEnabled = value;
                         if (!value) {
@@ -145,6 +113,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _salesNotifications = false;
                         }
                       });
+                      await _notificationService.setNotificationsEnabled(value);
+                      if (!value) {
+                        await _notificationService.setLowStockAlertsEnabled(
+                          false,
+                        );
+                        await _notificationService.setSalesNotificationsEnabled(
+                          false,
+                        );
+                      }
                     },
                   ),
                   const Divider(height: 1),
@@ -155,10 +132,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _lowStockAlerts,
                     onChanged:
                         _notificationsEnabled
-                            ? (value) {
+                            ? (value) async {
                               setState(() {
                                 _lowStockAlerts = value;
                               });
+                              await _notificationService
+                                  .setLowStockAlertsEnabled(value);
                             }
                             : null,
                   ),
@@ -170,10 +149,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _salesNotifications,
                     onChanged:
                         _notificationsEnabled
-                            ? (value) {
+                            ? (value) async {
                               setState(() {
                                 _salesNotifications = value;
                               });
+                              await _notificationService
+                                  .setSalesNotificationsEnabled(value);
                             }
                             : null,
                   ),
@@ -326,102 +307,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showThemeDialog() {
-    final localizations = AppLocalizations.of(context);
-
-    showDialog(
-      context: context,
-      builder:
-          (context) => Consumer<ThemeProvider>(
-            builder:
-                (context, themeProvider, child) => AlertDialog(
-                  title: Text('Select ${localizations.theme}'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children:
-                        AppThemeMode.values.map((themeMode) {
-                          return RadioListTile<AppThemeMode>(
-                            title: Text(
-                              themeProvider.getThemeDisplayName(themeMode),
-                            ),
-                            value: themeMode,
-                            groupValue: themeProvider.themeMode,
-                            onChanged: (value) async {
-                              if (value != null) {
-                                await themeProvider.setTheme(value);
-                                setState(() {
-                                  _selectedTheme = themeProvider
-                                      .getThemeDisplayName(value);
-                                });
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Theme changed to ${themeProvider.getThemeDisplayName(value)}',
-                                      ),
-                                      backgroundColor: AppTheme.successColor,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          );
-                        }).toList(),
-                  ),
-                ),
-          ),
-    );
-  }
-
-  void _showLanguageDialog() {
-    final localizations = AppLocalizations.of(context);
-
-    showDialog(
-      context: context,
-      builder:
-          (context) => Consumer<LocaleProvider>(
-            builder:
-                (context, localeProvider, child) => AlertDialog(
-                  title: Text('Select ${localizations.language}'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children:
-                        localeProvider.supportedLocales.map((locale) {
-                          return RadioListTile<Locale>(
-                            title: Text(
-                              localeProvider.getLanguageDisplayName(locale),
-                            ),
-                            value: locale,
-                            groupValue: localeProvider.locale,
-                            onChanged: (value) async {
-                              if (value != null) {
-                                await localeProvider.setLocale(value);
-                                setState(() {
-                                  _selectedLanguage = localeProvider
-                                      .getLanguageDisplayName(value);
-                                });
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Language changed to ${localeProvider.getLanguageDisplayName(value)}',
-                                      ),
-                                      backgroundColor: AppTheme.successColor,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          );
-                        }).toList(),
-                  ),
-                ),
-          ),
     );
   }
 

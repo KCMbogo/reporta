@@ -8,6 +8,7 @@ import '../models/product.dart';
 import '../models/stock_transaction.dart';
 import '../models/feedback.dart';
 import '../models/complaint.dart';
+import 'notification_service.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -422,6 +423,7 @@ class DatabaseService {
   // Stock transaction operations
   Future<int> insertStockTransaction(StockTransaction transaction) async {
     final db = await database;
+    final notificationService = NotificationService();
 
     // Insert the transaction
     final transactionId = await db.insert(
@@ -434,6 +436,30 @@ class DatabaseService {
     if (product != null) {
       final newQuantity = product.stockQuantity + transaction.effectiveQuantity;
       await updateProductStock(transaction.productId, newQuantity);
+
+      // Get updated product to check for low stock
+      final updatedProduct = await getProductById(transaction.productId);
+      if (updatedProduct != null) {
+        // Check for low stock notification
+        if (updatedProduct.isLowStock && updatedProduct.stockQuantity > 0) {
+          await notificationService.showLowStockNotification(
+            productName: updatedProduct.name,
+            currentStock: updatedProduct.stockQuantity,
+            threshold: updatedProduct.lowStockThreshold,
+          );
+        }
+
+        // Check for sales notification
+        if (transaction.transactionType == TransactionType.sale &&
+            transaction.totalAmount != null) {
+          await notificationService.showSalesNotification(
+            productName: updatedProduct.name,
+            quantity: transaction.quantity,
+            totalAmount: transaction.totalAmount!,
+            currency: updatedProduct.currency,
+          );
+        }
+      }
     }
 
     return transactionId;
