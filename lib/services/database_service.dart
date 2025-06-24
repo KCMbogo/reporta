@@ -26,7 +26,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'reporta.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createTables,
       onUpgrade: _upgradeDatabase,
     );
@@ -123,6 +123,23 @@ class DatabaseService {
 
       try {
         await db.execute('ALTER TABLE user_feedback ADD COLUMN name TEXT');
+      } catch (e) {
+        // Column might already exist
+      }
+    }
+
+    if (oldVersion < 3) {
+      // Add missing columns that were causing errors
+      try {
+        await db.execute(
+          'ALTER TABLE complaints ADD COLUMN priority TEXT NOT NULL DEFAULT "medium"',
+        );
+      } catch (e) {
+        // Column might already exist
+      }
+
+      try {
+        await db.execute('ALTER TABLE products ADD COLUMN image_url TEXT');
       } catch (e) {
         // Column might already exist
       }

@@ -5,6 +5,7 @@ import '../providers/theme_provider.dart';
 import '../providers/locale_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/bottom_navigation.dart';
+import '../l10n/app_localizations.dart';
 import 'account_screen.dart';
 import 'feedback_screen.dart';
 import 'complaints_screen.dart';
@@ -49,9 +50,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(localizations.settings),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -103,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.palette),
-                    title: const Text('Theme'),
+                    title: Text(localizations.theme),
                     subtitle: Text(_selectedTheme),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () => _showThemeDialog(),
@@ -111,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.language),
-                    title: const Text('Language'),
+                    title: Text(localizations.language),
                     subtitle: Text(_selectedLanguage),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () => _showLanguageDialog(),
@@ -327,90 +330,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showThemeDialog() {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context);
 
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('Select Theme'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children:
-                  AppThemeMode.values.map((themeMode) {
-                    return RadioListTile<AppThemeMode>(
-                      title: Text(themeProvider.getThemeDisplayName(themeMode)),
-                      value: themeMode,
-                      groupValue: themeProvider.themeMode,
-                      onChanged: (value) async {
-                        if (value != null) {
-                          await themeProvider.setTheme(value);
-                          setState(() {
-                            _selectedTheme = themeProvider.getThemeDisplayName(
-                              value,
-                            );
-                          });
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Theme changed to ${themeProvider.getThemeDisplayName(value)}',
-                                ),
-                                backgroundColor: AppTheme.successColor,
-                              ),
-                            );
-                          }
-                        }
-                      },
-                    );
-                  }).toList(),
-            ),
+          (context) => Consumer<ThemeProvider>(
+            builder:
+                (context, themeProvider, child) => AlertDialog(
+                  title: Text('Select ${localizations.theme}'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children:
+                        AppThemeMode.values.map((themeMode) {
+                          return RadioListTile<AppThemeMode>(
+                            title: Text(
+                              themeProvider.getThemeDisplayName(themeMode),
+                            ),
+                            value: themeMode,
+                            groupValue: themeProvider.themeMode,
+                            onChanged: (value) async {
+                              if (value != null) {
+                                await themeProvider.setTheme(value);
+                                setState(() {
+                                  _selectedTheme = themeProvider
+                                      .getThemeDisplayName(value);
+                                });
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Theme changed to ${themeProvider.getThemeDisplayName(value)}',
+                                      ),
+                                      backgroundColor: AppTheme.successColor,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        }).toList(),
+                  ),
+                ),
           ),
     );
   }
 
   void _showLanguageDialog() {
-    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context);
 
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('Select Language'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children:
-                  localeProvider.supportedLocales.map((locale) {
-                    return RadioListTile<Locale>(
-                      title: Text(
-                        localeProvider.getLanguageDisplayName(locale),
-                      ),
-                      value: locale,
-                      groupValue: localeProvider.locale,
-                      onChanged: (value) async {
-                        if (value != null) {
-                          await localeProvider.setLocale(value);
-                          setState(() {
-                            _selectedLanguage = localeProvider
-                                .getLanguageDisplayName(value);
-                          });
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Language changed to ${localeProvider.getLanguageDisplayName(value)}',
-                                ),
-                                backgroundColor: AppTheme.successColor,
-                              ),
-                            );
-                          }
-                        }
-                      },
-                    );
-                  }).toList(),
-            ),
+          (context) => Consumer<LocaleProvider>(
+            builder:
+                (context, localeProvider, child) => AlertDialog(
+                  title: Text('Select ${localizations.language}'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children:
+                        localeProvider.supportedLocales.map((locale) {
+                          return RadioListTile<Locale>(
+                            title: Text(
+                              localeProvider.getLanguageDisplayName(locale),
+                            ),
+                            value: locale,
+                            groupValue: localeProvider.locale,
+                            onChanged: (value) async {
+                              if (value != null) {
+                                await localeProvider.setLocale(value);
+                                setState(() {
+                                  _selectedLanguage = localeProvider
+                                      .getLanguageDisplayName(value);
+                                });
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Language changed to ${localeProvider.getLanguageDisplayName(value)}',
+                                      ),
+                                      backgroundColor: AppTheme.successColor,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        }).toList(),
+                  ),
+                ),
           ),
     );
   }

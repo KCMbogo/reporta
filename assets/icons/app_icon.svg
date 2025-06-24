@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#2E7D32"/>
+  
+  <!-- Main inventory box -->
+  <rect x="128" y="160" width="256" height="192" rx="16" fill="#FFFFFF" stroke="#1B5E20" stroke-width="4"/>
+  
+  <!-- Box lines -->
+  <line x1="128" y1="200" x2="384" y2="200" stroke="#1B5E20" stroke-width="2"/>
+  <line x1="128" y1="240" x2="384" y2="240" stroke="#1B5E20" stroke-width="2"/>
+  <line x1="128" y1="280" x2="384" y2="280" stroke="#1B5E20" stroke-width="2"/>
+  <line x1="128" y1="320" x2="384" y2="320" stroke="#1B5E20" stroke-width="2"/>
+  
+  <!-- Vertical lines -->
+  <line x1="200" y1="160" x2="200" y2="352" stroke="#1B5E20" stroke-width="2"/>
+  <line x1="312" y1="160" x2="312" y2="352" stroke="#1B5E20" stroke-width="2"/>
+  
+  <!-- Checkmarks -->
+  <path d="M 140 180 L 150 190 L 170 170" stroke="#4CAF50" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 140 220 L 150 230 L 170 210" stroke="#4CAF50" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 140 260 L 150 270 L 170 250" stroke="#4CAF50" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- Title -->
+  <text x="256" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#FFFFFF">R</text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="normal" fill="#FFFFFF">REPORTA</text>
+</svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#E0E0E0"/>
+  
+  <!-- Image icon -->
+  <rect x="50" y="60" width="100" height="80" rx="8" fill="#BDBDBD" stroke="#9E9E9E" stroke-width="2"/>
+  
+  <!-- Mountain shape -->
+  <path d="M 60 120 L 80 100 L 100 110 L 120 90 L 140 110 L 140 130 L 60 130 Z" fill="#9E9E9E"/>
+  
+  <!-- Sun -->
+  <circle cx="120" cy="80" r="8" fill="#FFC107"/>
+  
+  <!-- Text -->
+  <text x="100" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#757575">Image</text>
+</svg>

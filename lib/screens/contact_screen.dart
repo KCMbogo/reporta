@@ -8,9 +8,7 @@ class ContactScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Contact Us'),
-      ),
+      appBar: AppBar(title: const Text('Contact Us')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -30,11 +28,7 @@ class ContactScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(
-                    Icons.contact_support,
-                    size: 64,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.contact_support, size: 64, color: Colors.white),
                   const SizedBox(height: 16),
                   Text(
                     'Get in Touch',
@@ -46,9 +40,9 @@ class ContactScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'We\'re here to help! Reach out to us through any of the channels below.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white70,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -77,18 +71,26 @@ class ContactScreen extends StatelessWidget {
                     'Send us an email for general inquiries and support',
                     Icons.email,
                     AppTheme.primaryColor,
-                    () => _copyToClipboard(context, 'support@reporta.app', 'Email'),
+                    () => _copyToClipboard(
+                      context,
+                      'support@reporta.app',
+                      'Email',
+                    ),
                   ),
 
                   // Phone Support
                   _buildContactCard(
                     context,
                     'Phone Support',
-                    '+1 (555) 123-4567',
+                    '+255625290997',
                     'Call us for urgent issues and immediate assistance',
                     Icons.phone,
                     AppTheme.successColor,
-                    () => _copyToClipboard(context, '+1 (555) 123-4567', 'Phone number'),
+                    () => _copyToClipboard(
+                      context,
+                      '+255625290997',
+                      'Phone number',
+                    ),
                   ),
 
                   // Technical Support
@@ -99,7 +101,11 @@ class ContactScreen extends StatelessWidget {
                     'Report bugs, technical issues, and feature requests',
                     Icons.build,
                     AppTheme.warningColor,
-                    () => _copyToClipboard(context, 'tech@reporta.app', 'Technical support email'),
+                    () => _copyToClipboard(
+                      context,
+                      'tech@reporta.app',
+                      'Technical support email',
+                    ),
                   ),
 
                   // Business Hours
@@ -140,28 +146,28 @@ class ContactScreen extends StatelessWidget {
                               const SizedBox(width: 12),
                               Text(
                                 'Reporta Headquarters',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            '123 Innovation Drive\nSuite 456\nTech City, TC 12345\nUnited States',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              height: 1.5,
-                            ),
+                            '001 Kananura Street\nKivule 1102\nDar es salaam, Tanzania',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(height: 1.5),
                           ),
                           const SizedBox(height: 16),
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: () => _copyToClipboard(
-                                context,
-                                '123 Innovation Drive, Suite 456, Tech City, TC 12345, United States',
-                                'Address',
-                              ),
+                              onPressed:
+                                  () => _copyToClipboard(
+                                    context,
+                                    '001 Kananura Street, Kivule 1102, Dar es salaam, Tanzania',
+                                    'Address',
+                                  ),
                               icon: const Icon(Icons.copy),
                               label: const Text('Copy Address'),
                             ),
@@ -188,7 +194,7 @@ class ContactScreen extends StatelessWidget {
                         child: _buildSocialCard(
                           context,
                           'Twitter',
-                          '@ReportaApp',
+                          '@Kadilana1',
                           Icons.alternate_email,
                           const Color(0xFF1DA1F2),
                         ),
@@ -198,7 +204,7 @@ class ContactScreen extends StatelessWidget {
                         child: _buildSocialCard(
                           context,
                           'LinkedIn',
-                          'Reporta Inc.',
+                          'Kadilana Mbogo',
                           Icons.business,
                           const Color(0xFF0077B5),
                         ),
@@ -231,7 +237,9 @@ class ContactScreen extends StatelessWidget {
                             const SizedBox(width: 12),
                             Text(
                               'Emergency Support',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
                                 color: AppTheme.errorColor,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -245,12 +253,12 @@ class ContactScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '📞 Emergency Hotline: +1 (555) 911-HELP\n'
+                          '📞 Emergency Hotline: +255625290997\n'
                           '📧 Emergency Email: emergency@reporta.app\n'
                           '⏰ Available 24/7 for critical issues',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            height: 1.5,
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(height: 1.5),
                         ),
                       ],
                     ),
@@ -281,7 +289,9 @@ class ContactScreen extends StatelessWidget {
                             const SizedBox(width: 12),
                             Text(
                               'Response Times',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
                                 color: AppTheme.infoColor,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -295,9 +305,9 @@ class ContactScreen extends StatelessWidget {
                           '• Bug Reports: Within 6 hours\n'
                           '• Emergency Issues: Within 1 hour\n'
                           '• Feature Requests: Within 48 hours',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            height: 1.6,
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(height: 1.6),
                         ),
                       ],
                     ),
@@ -363,11 +373,7 @@ class ContactScreen extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                Icon(
-                  Icons.copy,
-                  color: AppTheme.textSecondaryColor,
-                  size: 20,
-                ),
+                Icon(Icons.copy, color: AppTheme.textSecondaryColor, size: 20),
             ],
           ),
         ),
@@ -394,16 +400,16 @@ class ContactScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 platform,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
                 handle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: color,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: color),
               ),
             ],
           ),
